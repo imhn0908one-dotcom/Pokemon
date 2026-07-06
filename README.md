@@ -63,6 +63,12 @@
 - 特性の基本情報を保持する。
 - 主要カラム例: `id`, `name`
 
+[Poke API GraphiQL console](https://graphql.pokeapi.co/v1beta2/console)を用いた。
+
+### これから必要になるデータ
+
+
+
 ## 利用メモ
 - `battle_manager.py` では `move_basicdata` から技の基本情報を取得する。
 - `move_meta` と `move_stat_change` は、技の追加効果・状態異常・能力変化を実装するために使う。
