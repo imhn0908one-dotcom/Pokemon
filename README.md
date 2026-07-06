@@ -1,123 +1,103 @@
-# Pokemon Project Notes
+# Pokemon battle systems
 
-## move_basicdata の主要キー
-- `id`: 技ID（主キー）
-- `name`: 技名
-- `type_id`: タイプID
-- `power`: 威力
-- `accuracy`: 命中率
-- `pp`: PP
-- `priority`: 優先度
-- `damage_class_id`: ダメージクラスID
-- `target_id`: 対象ID
+ポケモンの戦闘システムを、ダメージ計算・パーティ管理・バトルシミュレーションへ展開するための Python プロジェクトです。CUI で試作しながら、将来的には GUI や AI 学習環境へスケールできる構成を目指しています。
 
-## move_meta の主要キー
-- `id`: 技ID（主キー）
-- `min_hits`: 最小ヒット数
-- `max_hits`: 最大ヒット数
-- `min_turns`: 最小ターン数
-- `max_turns`: 最大ターン数
-- `drain`: 吸収量
-- `healing`: 回復量
-- `crit_rate`: クリティカル率
-- `ailment_id`: 状態異常ID
-- `ailment_chance`: 状態異常確率
-- `flinch_chance`: ひるみ確率
-- `stat_chance`: 能力変化確率
+## 🌟 プロジェクトの概要
 
-## move_stat_change の主要キー
-- `id`: 技ID（主キー）
-- `stat_id`: 能力値ID
-- `change`: 能力変化量
+このプロジェクトは、ポケモンの戦闘ロジックを段階的に実装していくための基盤です。現時点では、CUI ベースでパーティ管理やバトル関連のロジックを実装し、今後の機能拡張に備えた構成になっています。
 
-## 主要テーブル一覧と用途
-### pokemon
-- ポケモンの基本情報と種族値を保持する。
-- 主要カラム例: `id`, `name`, `hp`, `attack`, `defense`, `special_attack`, `special_defense`, `speed`
+## ✅ 完成済みの内容
 
-### pokemon_move
-- ポケモンが覚える技の対応関係を保持する中間テーブル。
-- 主要カラム例: `pokemon_id`, `move_id`
+現在のリポジトリには、以下の内容が実装されています。
 
-### move_basicdata
-- 技の基本情報を保持する。
-- 主要カラム例: `id`, `name`, `type_id`, `power`, `accuracy`, `pp`, `priority`, `damage_class_id`, `target_id`
+- ポケモンのパーティを TOML 形式で作成・編集できる仕組み
+- パーティ編集のための CUI インターフェース
+- バトルロジック用の基本クラス群
+  - `Single_Battle_Manager`
+  - `Field_State` / `Side_State`
+  - `Pokemon_Instance`
+- 技・性格・特性・努力値を扱うためのデータ構造とロジック
 
-### move_meta
-- 技の追加効果や状態異常に関するメタ情報を保持する。
-- 主要カラム例: `id`, `min_hits`, `max_hits`, `min_turns`, `max_turns`, `drain`, `healing`, `crit_rate`, `ailment_id`, `ailment_chance`, `flinch_chance`, `stat_chance`
+## 🔭 これからの展望
 
-### move_stat_change
-- 技による能力変化の内容を保持する。
-- 主要カラム例: `id`, `stat_id`, `change`
+今後の開発では、以下を目標に進める予定です。
 
-### nature_data
-- 性格補正データを保持する。
-- 主要カラム例: `id`, `name`, `increased_stat_id`, `decreased_stat_id`
+- F1: 独立ダメージ計算ツールの完成
+- F2: チェンジ型パーティマネージャーの改善
+- F3: GUI 化
+- F4: 完全バトルの実装
+- F5: AI / 機械学習による最適化
 
-### pokemon_ability
-- ポケモンが持つ特性の対応関係を保持する。
-- 主要カラム例: `pokemon_id`, `ability_id`, `is_hidden`
+## 🧠 設計思想
 
-### ability_basicdata
-- 特性の基本情報を保持する。
-- 主要カラム例: `id`, `name`
+- UI 層とロジック層を分離し、CUI から GUI への移行を容易にする
+- データ駆動型の構成で、パーティ・技・性格・特性を柔軟に扱えるようにする
+- 高速なシミュレーションを前提とした、保守しやすい構造を意識する
+- MEMO.mdを確認すると開発に必要なことがまとめられている。
 
-[Poke API GraphiQL console](https://graphql.pokeapi.co/v1beta2/console)を用いた。
+## 🧰 必要な環境
 
-### これから必要になるデータ
+- Python 3.12 以上
+- uv（Astral 製の Python パッケージ管理ツール）
 
+## 🚀 セットアップ手順（uv 前提）
 
+### 1. uv をインストールする
 
-## 利用メモ
-- `battle_manager.py` では `move_basicdata` から技の基本情報を取得する。
-- `move_meta` と `move_stat_change` は、技の追加効果・状態異常・能力変化を実装するために使う。
-- `battle_engine.py` では `pokemon`, `nature_data`, `move_basicdata`, `pokemon_ability`, `ability_basicdata` を中心に初期化を行う。
+macOS / Homebrew を使う場合:
 
-## battle 配下のクラスとメソッドの説明
+```bash
+brew install uv
+```
 
-### Pokemon_Instance
-- 役割: 1匹分のポケモンをインスタンス化し、戦闘に必要な基礎情報・実数値・PP管理を行う。
-- メソッド一覧:
-  - `__init__`: TOML から受け取ったポケモン情報をもとに、ID・名前・技・性格・努力値・特性を保持し、種族値・性格補正・HP・PPを初期化する。
-  - `init_moves_and_pp`: 技ID一覧を受け取り、`move_basicdata` から PP と技名を取得して `moves_pp` / `moves_name` を作る。
-  - `get_rank_multiplier`: ランク補正の倍率を計算する。
-  - `get_effective_stat`: ランク補正を反映した実効ステータスを計算する。
-  - `show_status`: 現在の HP・ステータス・PP・技名をコンソールへ表示する。
-  - `toml_input`: TOML ファイルを読み込む補助関数。
+または公式インストーラーを使う場合:
 
-### Single_Battle_Manager
-- 役割: 2体のポケモンを用いたシングルバトルの進行を管理する。
-- メソッド一覧:
-  - `__init__`: 対戦する2体のポケモンを保持し、ターン数・勝者情報を初期化する。
-  - `move_basic_data`: 指定技IDの `move_basicdata` レコードを取得する。
-  - `move_meta_data`: 指定技IDの `move_meta` レコードを取得する。
-  - `calculate_final_priority`: 技の優先度を計算する。現状は基本値を取得しているだけ。
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-### Field_State / Side_State
-- 役割: バトルフィールドの状態を管理する。
-- メソッド一覧:
-  - `Side_State.__init__`: ステルスロック・まきびし・どくびし・リフレクター・ひかりのかべの残りターンなどを初期化する。
-  - `Field_State.__init__`: 天候・トリックルーム・プレイヤーA/B側の陣地情報を初期化する。
+### 2. リポジトリをクローンする
 
-### Party_Builder
-- 役割: 対話形式でパーティを作成し、TOML に保存する。
-- メソッド一覧:
-  - `connect_db`: SQLite に接続する。
-  - `close_db`: 接続を閉じる。
-  - `start_session`: パーティ名入力・ポケモン追加・TOML保存までの全体フローを回す。
-  - `_input_pokemon`: 1匹分のポケモン入力をまとめて処理する。
-  - `_input_moves`: 4つの技IDを入力する。
-  - `_input_nature`: 性格IDを入力する。
-  - `_input_ability`: 特性IDを入力する。
-  - `_input_evs`: 努力値を入力する。
-  - `save_to_toml`: 作成したパーティを TOML へ書き出す。
+```bash
+git clone <your-repository-url>
+cd Pokemon
+```
 
-## 構造上の改善点（変更なし）
-- `battle_engine.py` と `battle_manager.py` の責務が混在しており、今後は「ポケモンの状態管理」と「バトル進行管理」を分けると保守しやすい。
-- `Pokemon_Instance` の `__init__` が種族値計算・性格補正・PP初期化・DBアクセスをまとめて担当しているため、分割すると読みやすくなる。
-- `Single_Battle_Manager` は今後 `turn_loop` や `apply_move_effects` などのバトルフェーズ処理を追加する前提で、メソッドを段階的に増やす構造にした方が自然。
-- `Party_Builder` は対話入力ロジックと DB 依存のロジックが強く結びついているため、入力UI層とデータ取得層を分けると再利用しやすい。
-- `Field_State` / `Side_State` は今後の状態異常・天候・場の効果を追加する前提で、メソッドを持つ構造に拡張しやすい。
+### 3. 仮想環境を作成し、依存関係をインストールする
 
-[ダメージ計算式サイト](https://champions.pokewiki.net/%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E8%A8%88%E7%AE%97%E5%BC%8F)
+このプロジェクトでは、依存関係の管理に uv を使用します。次のコマンドを実行すると、仮想環境が作成され、必要なパッケージが自動で入ります。
+
+```bash
+uv sync
+```
+
+### 4. 実行する
+
+現在の実装は、主要なロジックや CUI 画面を直接実行する構成です。必要に応じて、対象スクリプトを `uv run python ...` で実行してください。
+
+```bash
+uv run python battle/party_manager_cui.py
+```
+
+## 📁 プロジェクト構成
+
+- `battle/` : 戦闘ロジック、フィールド状態、パーティ管理関連
+- `buildDB/` : ポケモン・技・タイプ・特性データの構築スクリプト
+- `party/` : パーティの TOML ファイル
+
+## 🗂️ 開発メモ
+
+### データベースで扱う主要テーブル
+
+- `pokemon` : ポケモンの基本情報と種族値
+- `pokemon_move` : ポケモンが覚える技の対応関係
+- `move_basicdata` : 技の基本情報
+- `move_meta` : 技の追加効果・状態異常関連情報
+- `move_stat_change` : 技による能力変化情報
+- `nature_data` : 性格補正データ
+- `pokemon_ability` : 特性の対応関係
+- `ability_basicdata` : 特性の基本情報
+
+## 📄 ライセンス
+
+このプロジェクトは MIT License のもとで公開されています。
