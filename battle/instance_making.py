@@ -4,7 +4,10 @@ import toml
 
 
 class Pokemon_Instance:
+    """1匹分のポケモン状態を保持し、戦闘で使う実数値やPPを計算する。"""
+
     def __init__(self, pokemon_dict, db_path="pokemon_champions.db"):
+        """外部データからポケモンの基本情報と計算済みステータスを初期化する。"""
 
         # from pokemon_dict
         self.db_path = db_path
@@ -119,6 +122,7 @@ class Pokemon_Instance:
 
     @classmethod
     def from_toml(cls, toml_path, pokemon_index, db_path="pokemon_champions.db"):
+        """TOML形式のパーティデータから、指定スロットのポケモンを生成する。"""
         with open(toml_path, "r", encoding="utf-8") as f:
             data = toml.load(f)
 
@@ -147,10 +151,7 @@ class Pokemon_Instance:
         return cls(pokemon_dict, db_path=db_path)
 
     def init_moves_and_pp(self, db_path):
-        """
-        渡された技IDリストから、技の『最大PP』と『技名』を同時に取得し、
-        それぞれの辞書に保存する。
-        """
+        """所持技のIDから技名とPPを取得し、内部状態に反映する。"""
         if not self.moves:
             return
 
@@ -199,12 +200,14 @@ class Pokemon_Instance:
         conn.close()
 
     def get_rank_multiplier(self, rank):
+        """ランク補正の倍率を計算する。"""
         if rank >= 0:
             return (2 + rank) / 2
         else:
             return (2 - rank) / 2
 
     def get_effective_stat(self, stat):
+        """ランク補正を反映した実効ステータスを返す。"""
         # 基本値を取得
         base_value = getattr(self, stat)
         # 倍率を計算
@@ -213,10 +216,7 @@ class Pokemon_Instance:
         return math.floor(base_value * multiplier)
 
     def show_status(self):
-        """
-        現在のポケモンの全ステータス（実数値、能力ポイント、現在のランク、HP、PP）
-        をコンソールに美しく一発表示するデバッグ・確認用関数。
-        """
+        """現在のステータスをコンソールへわかりやすく表示する。"""
         print("=" * 45)
         print(" ［ ポケモンステータス確認 ］")
         print(f" 名前: {self.name} (ID: {self.id})")
@@ -247,7 +247,9 @@ class Pokemon_Instance:
             )
         print("=" * 45)
 
+    @staticmethod
     def toml_input(toml_path) -> dict:
+        """TOMLファイルを読み込む補助メソッド。"""
         with open(toml_path, "r", encoding="utf-8") as f:
             data = toml.load(f)
         return data

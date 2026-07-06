@@ -5,12 +5,15 @@ except ImportError:
 
 
 class PartyManagerCUI:
+    """パーティ管理の操作を対話形式で行うCUIクラス。"""
+
     def __init__(self, builder=None, input_func=input, output_func=print):
         self.builder = builder or PartyManagerLogic()
         self.input = input_func
         self.print = output_func
 
     def start(self):
+        """セッションを開始し、パーティの表示・編集・保存を繰り返す。"""
         self.print("==========================================")
         self.print("⚔️  PartyManager CUI セッション開始  ⚔️")
         self.print("==========================================")
@@ -39,7 +42,7 @@ class PartyManagerCUI:
     def _display_party(self):
         party = self.builder.get_current_party()
         self.print("\n=== 現在のパーティ ===")
-        for idx, pokemon in enumerate(party["pokemon"]):
+        for idx, pokemon in enumerate(party["pokemon"]):  # type: ignore
             self.print(
                 f"[{idx}] {pokemon['name']} (ID:{pokemon['pokemon_id']}), "
                 f"Lv{pokemon['level']}, Nature:{pokemon['nature_name']} ({pokemon['nature_id']}), "
@@ -48,6 +51,7 @@ class PartyManagerCUI:
         self.print("=======================")
 
     def _choose_action(self):
+        """ユーザーに選択肢を示して、次の操作を決める。"""
         self.print("\n操作を選択してください:")
         self.print("  1) スロットを変更")
         self.print("  2) ポケモンを読み込み")
@@ -128,7 +132,7 @@ class PartyManagerCUI:
 
     def _change_moves(self, slot_index):
         try:
-            pokemon = self.builder.get_current_party()["pokemon"][slot_index]
+            pokemon = self.builder.get_current_party()["pokemon"][slot_index]  # type: ignore
             pokemon_id = pokemon["pokemon_id"]
             if pokemon_id == 0:
                 self.print(
@@ -174,7 +178,7 @@ class PartyManagerCUI:
 
     def _change_ability(self, slot_index):
         try:
-            pokemon = self.builder.get_current_party()["pokemon"][slot_index]
+            pokemon = self.builder.get_current_party()["pokemon"][slot_index]  # type: ignore
             pokemon_id = pokemon["pokemon_id"]
             if pokemon_id == 0:
                 self.print(

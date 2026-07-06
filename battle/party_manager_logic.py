@@ -5,20 +5,22 @@ import toml
 
 
 class PartyManagerLogic:
+    """パーティデータの作成・読み込み・保存・更新を担当するロジック層。"""
+
     DEFAULT_PARTY_SIZE = 6
     DEFAULT_LEVEL = 50
     DEFAULT_EMPTY_NAME = "（未選択）"
     DEFAULT_EMPTY_ABILITY_NAME = "（未選択）"
     DEFAULT_EMPTY_MOVE = 0
     DEFAULT_PARTY_DIR = "party"
-    STAT_NAMES = [
+    STAT_NAMES = (
         "hp",
         "attack",
         "defense",
         "special_attack",
         "special_defense",
         "speed",
-    ]
+    )
     MAX_EV_PER_STAT = 32
     MAX_EV_TOTAL = 66
 
@@ -28,10 +30,12 @@ class PartyManagerLogic:
         self.party_data = None
 
     def _ensure_party_dir(self):
+        """partyディレクトリが存在しなければ作成する。"""
         if not os.path.exists(self.DEFAULT_PARTY_DIR):
             os.makedirs(self.DEFAULT_PARTY_DIR, exist_ok=True)
 
     def _resolve_party_path(self, filepath):
+        """相対パスをpartyディレクトリ配下に解決する。"""
         if filepath is None:
             return None
         if os.path.isabs(filepath):
@@ -42,6 +46,7 @@ class PartyManagerLogic:
 
     @contextmanager
     def _database(self):
+        """DB接続をコンテキストマネージャとして扱うためのヘルパー。"""
         conn = sqlite3.connect(self.db_path)
         try:
             yield conn.cursor()
@@ -117,6 +122,7 @@ class PartyManagerLogic:
             ]
 
     def create_empty_party(self, party_name, filepath=None):
+        """空のパーティを作成し、TOMLとして保存する。"""
         if not party_name or not isinstance(party_name, str):
             raise ValueError("party_name must be a non-empty string")
 
@@ -134,17 +140,19 @@ class PartyManagerLogic:
         return self.party_path
 
     def load_party(self, filepath):
+        """既存のTOMLパーティを読み込んでメモリ上に展開する。"""
         if not filepath:
             raise ValueError("filepath must be provided")
         resolved_path = self._resolve_party_path(filepath)
-        if not os.path.exists(resolved_path):
+        if not os.path.exists(resolved_path):  # type: ignore
             raise FileNotFoundError(f"Party file not found: {resolved_path}")
-        with open(resolved_path, "r", encoding="utf-8") as handle:
+        with open(resolved_path, "r", encoding="utf-8") as handle:  # type: ignore
             self.party_data = toml.load(handle)
         self.party_path = resolved_path
         return self.party_data
 
     def save_changes(self, filepath=None):
+        """現在のパーティ内容をTOMLに保存する。"""
         if self.party_data is None:
             raise RuntimeError("No party is loaded to save.")
         if filepath:
@@ -158,6 +166,7 @@ class PartyManagerLogic:
         return self.party_path
 
     def _build_empty_slot(self, default_nature_id, default_nature_name):
+        """空のパーティスロットの初期構造を返す。"""
         return {
             "pokemon_id": 0,
             "name": self.DEFAULT_EMPTY_NAME,
@@ -204,19 +213,17 @@ class PartyManagerLogic:
         )
         nature_name = self.get_nature_name(nature_id) or self.get_default_nature()[1]
 
-        self.party_data["pokemon"][index].update(
-            {
-                "pokemon_id": pokemon_id,
-                "name": pokemon_name,
-                "level": self.DEFAULT_LEVEL,
-                "ability_id": 0,
-                "ability_name": self.DEFAULT_EMPTY_ABILITY_NAME,
-                "moves": [self.DEFAULT_EMPTY_MOVE] * 4,
-                "evs": {stat: 0 for stat in self.STAT_NAMES},
-                "nature_id": nature_id,
-                "nature_name": nature_name,
-            }
-        )
+        self.party_data["pokemon"][index].update({
+            "pokemon_id": pokemon_id,
+            "name": pokemon_name,
+            "level": self.DEFAULT_LEVEL,
+            "ability_id": 0,
+            "ability_name": self.DEFAULT_EMPTY_ABILITY_NAME,
+            "moves": [self.DEFAULT_EMPTY_MOVE] * 4,
+            "evs": {stat: 0 for stat in self.STAT_NAMES},
+            "nature_id": nature_id,
+            "nature_name": nature_name,
+        })
         return self.save_changes()
 
     def change_pokemon_ev(self, index, stat_name, value):
@@ -320,4 +327,5 @@ class PartyManagerLogic:
         return self.save_changes()
 
     def get_current_party(self):
+        """現在のパーティデータを取得する。"""
         return self.party_data

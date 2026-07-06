@@ -2,9 +2,13 @@
 
 ポケモンの戦闘システムを、ダメージ計算・パーティ管理・バトルシミュレーションへ展開するための Python プロジェクトです。CUI で試作しながら、将来的には GUI や AI 学習環境へスケールできる構成を目指しています。
 
+This project is a Python-based implementation of Pokémon battle systems, designed to facilitate damage calculation, party management, and battle simulation. It starts with a command-line interface (CUI) prototype and aims to scale towards a graphical user interface (GUI) and AI learning environment in the future.
+
 ## 🌟 プロジェクトの概要
 
 このプロジェクトは、ポケモンの戦闘ロジックを段階的に実装していくための基盤です。現時点では、CUI ベースでパーティ管理やバトル関連のロジックを実装し、今後の機能拡張に備えた構成になっています。
+
+This project is basis of implementing Pokémon battle logic in stages. Currently, it focuses on command-line interface (CUI) based party management and battle-related logic, with a structure designed to accommodate future feature expansions.
 
 ## ✅ 完成済みの内容
 
@@ -33,7 +37,7 @@
 - UI 層とロジック層を分離し、CUI から GUI への移行を容易にする
 - データ駆動型の構成で、パーティ・技・性格・特性を柔軟に扱えるようにする
 - 高速なシミュレーションを前提とした、保守しやすい構造を意識する
-- MEMO.mdを確認すると開発に必要なことがまとめられている。
+
 
 ## 🧰 必要な環境
 
@@ -79,6 +83,11 @@ uv sync
 uv run python battle/party_manager_cui.py
 ```
 
+## Recomend Extension
+
+- [vscode-pokemon](https://marketplace.visualstudio.com/items?itemName=jakobhoeg.vscode-pokemon)
+- [SQLite Viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer)
+
 ## 📁 プロジェクト構成
 
 - `battle/` : 戦闘ロジック、フィールド状態、パーティ管理関連
@@ -86,7 +95,7 @@ uv run python battle/party_manager_cui.py
 - `party/` : パーティの TOML ファイル
 
 ## 🗂️ 開発メモ
-
+- MEMO.mdを確認すると開発に必要なことがまとめられている。
 ### データベースで扱う主要テーブル
 
 - `pokemon` : ポケモンの基本情報と種族値
