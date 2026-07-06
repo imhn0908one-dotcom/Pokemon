@@ -8,7 +8,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
-        logging.FileHandler("pokemon_and_ability_fetch.log", encoding="utf-8"),
+        logging.FileHandler("log/pokemon_and_ability_fetch.log", encoding="utf-8"),
         logging.StreamHandler(),
     ],
 )

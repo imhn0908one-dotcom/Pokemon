@@ -1,2 +1,0 @@
-2026-07-06 18:42:02 [INFO] === 🌐 PokeAPI GraphQL からポケモン＆複数特性データの同時取得を開始 ===
-2026-07-06 18:42:03 [CRITICAL] 🚨 API通信中にエラーが発生しました: 521 Server Error: <none> for url: https://graphql.pokeapi.co/v1beta2
