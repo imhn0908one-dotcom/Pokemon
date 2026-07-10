@@ -1,5 +1,6 @@
 import sqlite3
 import toml
+from typing import Optional, List, Dict
 
 
 class PartyBuilderLogic:
@@ -12,7 +13,7 @@ class PartyBuilderLogic:
         return conn, conn.cursor()
 
     # --- 1. ポケモン検証 & データ取得 ---
-    def get_pokemon_data(self, pokemon_id) -> dict:
+    def get_pokemon_data(self, pokemon_id) -> Optional[dict]:
         """ポケモンIDが有効なら名前を返す。無効なら None"""
         conn, cursor = self._get_cursor()
         cursor.execute("SELECT name FROM pokemon WHERE id = ?", (pokemon_id,))
@@ -21,7 +22,7 @@ class PartyBuilderLogic:
         return {"pokemon_id": pokemon_id, "name": row[0]} if row else None
 
     # --- 2. 技の検証 & 候補取得 ---
-    def get_learnable_moves(self, pokemon_id) -> list:
+    def get_learnable_moves(self, pokemon_id) -> List[int]:
         """そのポケモンが覚えられる技IDのリストを返す"""
         conn, cursor = self._get_cursor()
         cursor.execute(
@@ -41,7 +42,7 @@ class PartyBuilderLogic:
         return all(m_id in learnable for m_id in selected_move_ids)
 
     # --- 3. 性格データの取得 ---
-    def get_nature_list(self) -> list:
+    def get_nature_list(self) -> List[Dict]:
         """CUIの選択肢に表示するための性格IDと名前のリストを返す"""
         conn, cursor = self._get_cursor()
         cursor.execute("SELECT id, name FROM nature_data ORDER BY id")
@@ -51,7 +52,7 @@ class PartyBuilderLogic:
         conn.close()
         return natures
 
-    def get_nature_name(self, nature_id) -> str:
+    def get_nature_name(self, nature_id) -> Optional[str]:
         """性格IDから性格名を取得する（存在しなければNone）"""
         conn, cursor = self._get_cursor()
         cursor.execute("SELECT name FROM nature_data WHERE id = ?", (nature_id,))
@@ -60,7 +61,7 @@ class PartyBuilderLogic:
         return row[0] if row else None
 
     # --- 4. 特性データの取得 ---
-    def get_available_abilities(self, pokemon_id):
+    def get_available_abilities(self, pokemon_id) -> List[Dict]:
         """そのポケモンが持つ特性IDと名前の辞書リストを返す"""
         conn, cursor = self._get_cursor()
         cursor.execute(

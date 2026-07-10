@@ -1,28 +1,34 @@
 import sqlite3
 import requests
 
-# 正しいURL
-GRAPHQL_URL = "https://beta.pokeapi.co/graphql/v1beta2"
+GRAPHQL_URL = "https://graphql.pokeapi.co/v1beta2"
 DB_NAME = "pokemon_champions.db"
 
 
 def init_type_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute("""
+
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS types (
             id INTEGER PRIMARY KEY,
             name TEXT UNIQUE
         )
-    """)
-    cursor.execute("""
+        """
+    )
+
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS type_matchups (
             attack_type_id INTEGER,
             defense_type_id INTEGER,
             multiplier REAL,
             PRIMARY KEY (attack_type_id, defense_type_id)
         )
-    """)
+        """
+    )
+
     conn.commit()
     return conn
 
@@ -33,14 +39,13 @@ def fetch_and_build_types():
 
     print("=== 1. GraphQLでタイプと相性データを一括取得中 ===")
 
-    # 🌟 正しい呪文（フィールド名を正しく修正しました）
     type_query = """
-    query getTypeMatchups {
-      types: pokemon_v2_type(where: {id: {_lt: 10000}}) {
+    query samplePokeAPIquery {
+      type {
         id
         name
-        pokemon_v2_typeefficacies {
-          target_type_id
+        typeefficacies {
+          damage_type_id
           damage_factor
         }
       }
@@ -55,16 +60,15 @@ def fetch_and_build_types():
         print(response_json["errors"])
         return
 
-    if "data" not in response_json or "types" not in response_json["data"]:
+    if "data" not in response_json or "type" not in response_json["data"]:
         print("❌ 想定外のデータ構造が返ってきました。返却データ:")
         print(response_json)
         return
 
-    type_data = response_json["data"]["types"]
+    type_data = response_json["data"]["type"]
     print(f"-> {len(type_data)} 個のタイプデータをパース中...")
 
-    # === 2. データの解読とSQLiteへの保存 ===
-    # まず、すべての組み合わせをいったん「1.0倍（等倍）」で初期化する
+    # 初期化: 全組み合わせを等倍(1.0)で作成
     for t_atk in type_data:
         cursor.execute(
             "INSERT OR REPLACE INTO types (id, name) VALUES (?, ?)",
@@ -77,20 +81,19 @@ def fetch_and_build_types():
             )
     conn.commit()
 
-    # 次に、APIから届いた倍率（2倍、0.5倍、0倍）を上書きしていく
+    # APIからの倍率情報で上書き
     for t in type_data:
         atk_id = t["id"]
-        # 🌟 ここも正しいフィールド名に修正
-        for efficacy in t["pokemon_v2_typeefficacies"]:
-            def_id = efficacy["target_type_id"]
+        for efficacy in t.get("typeefficacies", []):
+            def_id = efficacy["damage_type_id"]
             multiplier = efficacy["damage_factor"] / 100.0
 
             cursor.execute(
                 """
-                UPDATE type_matchups 
-                SET multiplier = ? 
+                UPDATE type_matchups
+                SET multiplier = ?
                 WHERE attack_type_id = ? AND defense_type_id = ?
-            """,
+                """,
                 (multiplier, atk_id, def_id),
             )
 
