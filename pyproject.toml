@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "logging>=0.4.9.6",
+    "numpy>=2.5.1",
     "pokebase>=1.4.1",
+    "pyside6>=6.11.1",
     "requests>=2.34.2",
     "toml>=0.10.2",
 ]

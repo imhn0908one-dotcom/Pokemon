@@ -6,9 +6,9 @@ This project is a Python-based implementation of Pokémon battle systems, design
 
 ## 🌟 プロジェクトの概要
 
-このプロジェクトは、ポケモンの戦闘ロジックを段階的に実装していくための基盤です。現時点では、CUI ベースでパーティ管理やバトル関連のロジックを実装し、今後の機能拡張に備えた構成になっています。
+このプロジェクトは、ポケモンの戦闘ロジックを段階的に実装していくための基盤です。まずは独立したダメージ計算機を完成させ、アタック側とディフェンス側のポケモンを選択し、技・環境・努力値を設定して最低/最大ダメージを算出できるようにします。その後、その計算メソッドを利用したモダンな GUI を構築し、さらにバトルシステムへと展開していきます。
 
-This project is basis of implementing Pokémon battle logic in stages. Currently, it focuses on command-line interface (CUI) based party management and battle-related logic, with a structure designed to accommodate future feature expansions.
+This project is a basis of implementing Pokémon battle logic in stages. The immediate focus is to build a standalone damage calculator that chooses attacker and defender Pokémon, configures moves, environment, and EVs, and computes minimum and maximum damage. After that, the plan is to build a modern GUI and then expand into a battle system using the same calculation engine.
 
 ## ✅ 完成済みの内容
 
@@ -24,13 +24,20 @@ This project is basis of implementing Pokémon battle logic in stages. Currently
 
 ## 🔭 これからの展望
 
-今後の開発では、以下を目標に進める予定です。
+今後の開発は、次の優先順位で進めます。
 
-- F1: 独立ダメージ計算ツールの完成
-- F2: チェンジ型パーティマネージャーの改善
-- F3: GUI 化
-- F4: 完全バトルの実装
+- F1: 独立ダメージ計算機の完成
+  - アタック側 / ディフェンス側を選択
+  - 技、環境、努力値を設定
+  - 最低ダメージと最大ダメージを算出
+- F2: モダンな GUI の実装
+  - ダメージ計算機を使った操作性の高い UI
+- F3: 計算メソッドを活用したバトル実装
+  - ダメージ計算ロジックを Battle フローへ統合する
+- F4: パーティ管理とバトル拡張
 - F5: AI / 機械学習による最適化
+
+現在の `battle/` フォルダにある既存のインスタンスメソッドは、ダメージ計算機と新規バトル実装に合わせて整理・削除して構いません。
 
 ## 🧠 設計思想
 

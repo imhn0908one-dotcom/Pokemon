@@ -61,9 +61,6 @@ class DamageCalculater:
         damage_class = movedata["damage_class_id"]  # タイプによって計算などが変化。
         # 1 = 変化, 2 = 物理, 3 = 特殊
 
-        
-
-
         if damage_class == 1:
             pass
         return damage
