@@ -3,9 +3,15 @@ from PySide6.QtWidgets import QComboBox
 
 
 class SelectionComboBox(QComboBox):
-    def __init__(self, placeholder="Select an option", items: Dict[int, str] = {}):
+    def __init__(
+        self,
+        placeholder="Select an option",
+        items: Dict[int, str] = {},
+        objectName="SelectionComboBox",
+    ):
         super().__init__()
         self.setEditable(True)
+        self.setObjectName(objectName)
         self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
 
         self.setPlaceholderText(placeholder)

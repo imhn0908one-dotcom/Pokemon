@@ -7,3 +7,54 @@
 QSplitter::handle {
     background-color: black;
 }
+/* QComboBox全体の基本スタイル */
+#pokemon_selection {
+    border: 2px solid #34495e;
+    border-radius: 1px;
+    padding: 5px 10px;
+    background: #ffffff;
+    font-size: 14px;
+    color: #0d5cac;
+}
+
+/* ホバーした時の動き */
+#pokemon_selection:hover {
+    border: 2px solid #3498db;
+    background-color: #8da8b9;
+}
+
+/* 押している時の動き */
+#pokemon_selection:on {
+    background: #ecf0f1;
+}
+
+/* 右側の矢印ボタンのカスタマイズ */
+#pokemon_selection::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 30px;
+    border-left: 1px solid #bdc3c7;
+}
+
+/* 矢印アイコン（画像を使うのが一番綺麗ですが、文字でも代用可） */
+#pokemon_selection::down-arrow {
+    image: url(IMAGES/monster_ball.png); /* アイコン画像へのパス */
+    width: 24px;
+    height: 24px;
+}
+
+/* ドロップダウンリスト（ポップアップ部分）のスタイル */
+#pokemon_selection QAbstractItemView {
+    border: 1px solid #bdc3c7;
+    background-color: #ffffff;
+    selection-background-color: #7034026e; /* 選択時の色 */
+    selection-color: #3a89b6;
+    border-radius: 4px;
+    color:#2c3e50
+
+}
+
+/* リスト内の各アイテムの高さ */
+#pokemon_selection QAbstractItemView::item {
+    height: 50px;
+}

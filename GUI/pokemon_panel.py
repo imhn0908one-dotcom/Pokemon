@@ -39,18 +39,6 @@ from GUI import panel_logic
 from GUI import field_panel
 
 
-class SelectionComboBox(QComboBox):
-    def __init__(self, placeholder="Select an option", items: Dict[int, str] = {}):
-        super().__init__()
-        self.setEditable(True)
-        self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-
-        self.setPlaceholderText(placeholder)
-        self.setCurrentIndex(-1)  # No selection initially
-        for key, value in items.items():
-            self.addItem(value, key)
-
-
 class PokemonPanel(QFrame):
     def __init__(self, panel_name, battle_manager):
         super().__init__()
@@ -65,13 +53,15 @@ class PokemonPanel(QFrame):
         main_layout = QVBoxLayout()
         main_layout.addWidget(QLabel(f"{panel_name} Selection"))
         self.pokemon_combo = panel_logic.SelectionComboBox(
-            items=manager.get_selectable_pokemon_map()
+            items=manager.get_selectable_pokemon_map(),
+            placeholder="Select a Pokemon",
+            objectName="pokemon_selection",
         )
         self.pokemon_combo.currentIndexChanged.connect(
             self.emit_updated_pokemon_instance
         )
         main_layout.addWidget(self.pokemon_combo)
-
+        print(self.styleSheet())
         self.setLayout(main_layout)
 
     # if pokemon is selected, emit pokemon instance
