@@ -1,0 +1,9 @@
+#left_pannel,#right_pannel,#result_pannel,#bottom_pannel{ 
+    border-color: aqua;
+    border-width: 2px;
+    border-style: solid;
+}
+
+QSplitter::handle {
+    background-color: black;
+}
