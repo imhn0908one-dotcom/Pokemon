@@ -16,16 +16,11 @@ from PySide6.QtWidgets import (
     QSlider,
     QDial,
 )
-from PySide6.QtGui import (
-    QIcon,
-    QPixmap,
-    QFont,
-    QAction,
-    QKeySequence,
-)
+from PySide6.QtGui import QIcon, QPixmap, QFont, QAction, QKeySequence, QImage
 from PySide6.QtCore import (
     Qt,
     QSize,
+    Slot,
     QTimer,
 )
 import sys
@@ -86,6 +81,7 @@ class MainWindow(QMainWindow):
         # style sheet
         self.load_stylesheet("GUI/style.qss")
 
+    @Slot(str)
     def load_stylesheet(self, stylesheet_path: str):
         """Load a stylesheet from a file and apply it to the main window."""
         if os.path.exists(stylesheet_path):
