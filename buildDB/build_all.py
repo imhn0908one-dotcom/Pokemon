@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sqlite3
+import time
 import requests
 
 # 共通設定
@@ -12,7 +13,37 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.FileHandler("log/build_all.log", encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
 )
+
+
+def post_graphql_request(query, variables=None, max_retries=3, timeout=10):
+    payload = {"query": query}
+    if variables is not None:
+        payload["variables"] = variables
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.post(GRAPHQL_URL, json=payload, timeout=timeout)
+            response.raise_for_status()
+            try:
+                return response.json()
+            except ValueError as err:
+                raise RuntimeError(
+                    f"GraphQL response was not valid JSON: {err}, text={response.text!r}"
+                ) from err
+        except requests.exceptions.RequestException as err:
+            if attempt == max_retries:
+                raise
+            logging.warning(
+                f"GraphQL request failed (attempt {attempt}/{max_retries}): {err}. Retrying..."
+            )
+            time.sleep(2 ** (attempt - 1))
+
+    raise RuntimeError("GraphQL request retries exhausted")
 
 
 # --- build_types.py の機能 ---
@@ -37,8 +68,12 @@ def fetch_and_build_types():
     }
     """
 
-    response = requests.post(GRAPHQL_URL, json={"query": type_query})
-    response_json = response.json()
+    try:
+        response_json = post_graphql_request(type_query)
+    except Exception as err:
+        logging.critical(f"🚨 GraphQL通信エラー: {err}")
+        conn.close()
+        return
 
     if "errors" in response_json:
         logging.critical(
@@ -145,26 +180,21 @@ def rebuild_ability_basicdata():
     logging.info("=== 🌐 PokeAPI GraphQL から特性データの取得開始 ===")
 
     try:
-        response = requests.post(
-            GRAPHQL_URL,
-            json={
-                "query": graphql_query,
-                "variables": {"abilityIds": target_ability_ids},
-            },
+        json_data = post_graphql_request(
+            graphql_query,
+            variables={"abilityIds": target_ability_ids},
         )
-        response.raise_for_status()
-        json_data = response.json()
-
-        if "errors" in json_data:
-            logging.critical(f"🚨 GraphQLクエリエラー: {json_data['errors']}")
-            conn.close()
-            return
-
-        logging.info("✨ データのダウンロードに成功しました！DBの再構築を開始します。")
-    except Exception as e:
-        logging.critical(f"🚨 API通信中にエラーが発生しました: {e}")
+    except Exception as err:
+        logging.critical(f"🚨 GraphQL通信エラー: {err}")
         conn.close()
         return
+
+    if "errors" in json_data:
+        logging.critical(f"🚨 GraphQLクエリエラー: {json_data['errors']}")
+        conn.close()
+        return
+
+    logging.info("✨ データのダウンロードに成功しました！DBの再構築を開始します。")
 
     logging.info("🧹 既存の ability_basicdata テーブルを削除して初期化します...")
     cursor.execute("DROP TABLE IF EXISTS ability_basicdata")
@@ -251,17 +281,16 @@ def rebuild_move_basicdata():
     logging.info("=== 🌐 PokeAPI GraphQL から基本データの取得開始 ===")
 
     try:
-        response = requests.post(
-            GRAPHQL_URL,
-            json={"query": graphql_query, "variables": {"moveIds": target_move_ids}},
+        json_data = post_graphql_request(
+            graphql_query,
+            variables={"moveIds": target_move_ids},
         )
-        response.raise_for_status()
-        json_data = response.json()
-        logging.info("✨ データのダウンロードに成功しました！DBの再構築を開始します。")
-    except Exception as e:
-        logging.critical(f"🚨 API通信中にエラーが発生しました: {e}")
+    except Exception as err:
+        logging.critical(f"🚨 GraphQL通信エラー: {err}")
         conn.close()
         return
+
+    logging.info("✨ データのダウンロードに成功しました！DBの再構築を開始します。")
 
     logging.info("🧹 既存の move_basicdata テーブルを削除して初期化します...")
     cursor.execute("DROP TABLE IF EXISTS move_basicdata")
@@ -391,23 +420,21 @@ def fetch_and_build_move_details():
     logging.info("=== 🌐 PokeAPI GraphQL から詳細データの取得開始 ===")
 
     try:
-        response = requests.post(
-            GRAPHQL_URL,
-            json={"query": graphql_query, "variables": {"moveIds": target_move_ids}},
+        json_data = post_graphql_request(
+            graphql_query,
+            variables={"moveIds": target_move_ids},
         )
-        response.raise_for_status()
-        json_data = response.json()
-
-        if "errors" in json_data:
-            logging.critical(f"🚨 GraphQLクエリエラー: {json_data['errors']}")
-            return
-
-        logging.info(
-            "✨ データのダウンロードに成功しました！DBの初期化と解析を開始します。"
-        )
-    except Exception as e:
-        logging.critical(f"🚨 API通信中にエラーが発生しました: {e}")
+    except Exception as err:
+        logging.critical(f"🚨 GraphQL通信エラー: {err}")
         return
+
+    if "errors" in json_data:
+        logging.critical(f"🚨 GraphQLクエリエラー: {json_data['errors']}")
+        return
+
+    logging.info(
+        "✨ データのダウンロードに成功しました！DBの初期化と解析を開始します。"
+    )
 
     logging.info(
         "🧹 既存の move_meta, move_stat_change テーブルを削除して初期化します..."
@@ -558,13 +585,12 @@ def fetch_and_build_tables():
     """
 
     try:
-        response = requests.post(GRAPHQL_URL, json={"query": GRAPHQL_QUERY})
-        response.raise_for_status()
-        json_data = response.json()
-        logging.info("✨ データのダウンロードに成功しました！解析を開始します。")
-    except Exception as e:
-        logging.critical(f"🚨 API通信中にエラーが発生しました: {e}")
+        json_data = post_graphql_request(GRAPHQL_QUERY)
+    except Exception as err:
+        logging.critical(f"🚨 GraphQL通信エラー: {err}")
         return
+
+    logging.info("✨ データのダウンロードに成功しました！解析を開始します。")
 
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -615,12 +641,12 @@ def fetch_and_build_tables():
             type_id2 = types_list[1].get("type_id") if len(types_list) > 1 else None
 
             stats_list = p_data.get("pokemonstats", [])
-            hp = stats_list[0].get("base_stat", 0) if len(stats_list) > 0 else 0
-            attack = stats_list[1].get("base_stat", 0) if len(stats_list) > 1 else 0
-            defense = stats_list[2].get("base_stat", 0) if len(stats_list) > 2 else 0
-            sp_attack = stats_list[3].get("base_stat", 0) if len(stats_list) > 3 else 0
-            sp_defense = stats_list[4].get("base_stat", 0) if len(stats_list) > 4 else 0
-            speed = stats_list[5].get("base_stat", 0) if len(stats_list) > 5 else 0
+            HP = stats_list[0].get("base_stat", 0) if len(stats_list) > 0 else 0
+            Atk = stats_list[1].get("base_stat", 0) if len(stats_list) > 1 else 0
+            Def = stats_list[2].get("base_stat", 0) if len(stats_list) > 2 else 0
+            SpA = stats_list[3].get("base_stat", 0) if len(stats_list) > 3 else 0
+            SpD = stats_list[4].get("base_stat", 0) if len(stats_list) > 4 else 0
+            Spe = stats_list[5].get("base_stat", 0) if len(stats_list) > 5 else 0
 
             cursor.execute(
                 """
@@ -633,12 +659,12 @@ def fetch_and_build_tables():
                     p_name,
                     type_id1,
                     type_id2,
-                    hp,
-                    attack,
-                    defense,
-                    sp_attack,
-                    sp_defense,
-                    speed,
+                    HP,
+                    Atk,
+                    Def,
+                    SpA,
+                    SpD,
+                    Spe,
                 ),
             )
             total_pokemon += 1
@@ -693,11 +719,10 @@ def fetch_and_save_natures():
     """
 
     try:
-        response = requests.post(GRAPHQL_URL, json={"query": GRAPHQL_QUERY})
-        response.raise_for_status()
-        data = response.json().get("data", {}).get("nature", [])
-    except Exception as e:
-        logging.critical(f"🚨 API通信エラー: {e}")
+        json_data = post_graphql_request(GRAPHQL_QUERY)
+        data = json_data.get("data", {}).get("nature", [])
+    except Exception as err:
+        logging.critical(f"🚨 API通信エラー: {err}")
         return
 
     conn = sqlite3.connect(DB_NAME)
@@ -727,6 +752,98 @@ def fetch_and_save_natures():
     logging.info(
         f"✨ 正常に {len(data)} 種類の性格補正データを `nature_data` に保存しました！"
     )
+
+
+def fetch_and_build_gender_rate():
+    logging.info(
+        "=== 🌐 データベース(pokemon)から対象IDを取得し、gender_rateを構築します ==="
+    )
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT DISTINCT id FROM pokemon")
+        pokemon_ids = [row[0] for row in cursor.fetchall()]
+        logging.info(
+            f"✨ pokemonテーブルから {len(pokemon_ids)} 件のIDを取得しました。"
+        )
+    except sqlite3.OperationalError as e:
+        logging.critical(f"🚨 pokemonテーブルが見つからないかエラーです: {e}")
+        conn.close()
+        return
+
+    if not pokemon_ids:
+        logging.warning(
+            "⚠️ pokemonテーブルにIDが存在しません。gender_rateの構築をスキップします。"
+        )
+        conn.close()
+        return
+
+    graphql_query = """
+    query GetPokemonSpeciesGenderRate($speciesIds: [Int!]) {
+      pokemonspecies(where: {id: {_in: $speciesIds}}) {
+        id
+        gender_rate
+      }
+    }
+    """
+
+    try:
+        json_data = post_graphql_request(
+            graphql_query,
+            variables={"speciesIds": pokemon_ids},
+        )
+    except Exception as err:
+        logging.critical(f"🚨 GraphQL通信エラー: {err}")
+        conn.close()
+        return
+
+    if "errors" in json_data:
+        logging.critical(f"🚨 GraphQLクエリエラー: {json_data['errors']}")
+        conn.close()
+        return
+
+    logging.info(
+        "✨ pokemonspeciesデータのダウンロードに成功しました！gender_rateの構築を開始します。"
+    )
+
+    cursor.execute("DROP TABLE IF EXISTS gender_rate")
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS gender_rate (
+            pokemon_id INTEGER PRIMARY KEY,
+            gender_rate INTEGER
+        )
+        """
+    )
+    conn.commit()
+
+    try:
+        species_list = json_data.get("data", {}).get("pokemonspecies", [])
+        species_id_set = set(pokemon_ids)
+        insert_count = 0
+
+        for species in species_list:
+            species_id = species.get("id")
+            if species_id not in species_id_set:
+                continue
+
+            cursor.execute(
+                "INSERT OR REPLACE INTO gender_rate (pokemon_id, gender_rate) VALUES (?, ?)",
+                (species_id, species.get("gender_rate", 0)),
+            )
+            insert_count += 1
+
+        conn.commit()
+        logging.info("=== 🏁 gender_rate テーブル構築が完了しました！ ===")
+        logging.info(f"・gender_rate 登録数: {insert_count} 件")
+    except Exception as e:
+        logging.critical(
+            f"🚨 gender_rate データ解析・DB書き込み中にエラーが発生しました: {e}"
+        )
+    finally:
+        conn.close()
 
 
 def finalize_db():
@@ -764,6 +881,9 @@ def main():
     )
     parser.add_argument("--move-detail", action="store_true", help="Build move details")
     parser.add_argument("--pokemon", action="store_true", help="Build pokemon tables")
+    parser.add_argument(
+        "--gender-rate", action="store_true", help="Build gender_rate table"
+    )
     parser.add_argument("--natures", action="store_true", help="Build nature data")
     args = parser.parse_args()
 
@@ -774,18 +894,32 @@ def main():
         # 3) types
         # 4) move basicdata
         # 5) move details
-        # 6) natures
+        # 6) gender_rate
+        # 7) natures
         fetch_and_build_tables()
         rebuild_ability_basicdata()
         fetch_and_build_types()
         rebuild_move_basicdata()
         fetch_and_build_move_details()
+        fetch_and_build_gender_rate()
         fetch_and_save_natures()
         finalize_db()
         return
 
     if args.types:
         fetch_and_build_types()
+    if args.ability:
+        rebuild_ability_basicdata()
+    if args.move_basic:
+        rebuild_move_basicdata()
+    if args.move_detail:
+        fetch_and_build_move_details()
+    if args.pokemon:
+        fetch_and_build_tables()
+    if args.gender_rate:
+        fetch_and_build_gender_rate()
+    if args.natures:
+        fetch_and_save_natures()
     if args.ability:
         rebuild_ability_basicdata()
     if args.move_basic:

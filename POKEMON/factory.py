@@ -1,10 +1,18 @@
 import sqlite3
 from typing import Optional
 
-from POKEMON.instance import PokemonInstance
-
+from .instance import PokemonInstance
 
 DB_PATH = "pokemon_champions.db"
+STAT_KEYS = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"]
+DB_STAT_COLUMNS = [
+    "hp",
+    "attack",
+    "defense",
+    "special_attack",
+    "special_defense",
+    "speed",
+]
 
 
 def _fetch_pokemon_row(conn: sqlite3.Connection, name: str) -> Optional[dict]:
@@ -16,18 +24,7 @@ def _fetch_pokemon_row(conn: sqlite3.Connection, name: str) -> Optional[dict]:
     )
     row = cur.fetchone()
     if row:
-        keys = [
-            "id",
-            "name",
-            "type_id1",
-            "type_id2",
-            "HP",
-            "Atk",
-            "Def",
-            "SpA",
-            "SpD",
-            "Spe",
-        ]
+        keys = ["id", "name", "type_id1", "type_id2"] + STAT_KEYS
         return dict(zip(keys, row, strict=True))
 
     # try numeric id
@@ -42,18 +39,7 @@ def _fetch_pokemon_row(conn: sqlite3.Connection, name: str) -> Optional[dict]:
     )
     row = cur.fetchone()
     if row:
-        keys = [
-            "id",
-            "name",
-            "type_id1",
-            "type_id2",
-            "HP",
-            "Atk",
-            "Def",
-            "SpA",
-            "SpD",
-            "Spe",
-        ]
+        keys = ["id", "name", "type_id1", "type_id2"] + STAT_KEYS
         return dict(zip(keys, row, strict=True))
 
     return None
@@ -78,18 +64,7 @@ def _fetch_pokemon_row_by_id(conn: sqlite3.Connection, pid: int) -> Optional[dic
     if not row:
         return None
 
-    keys = [
-        "id",
-        "name",
-        "type_id1",
-        "type_id2",
-        "HP",
-        "Atk",
-        "Def",
-        "SpA",
-        "SpD",
-        "Spe",
-    ]
+    keys = ["id", "name", "type_id1", "type_id2"] + STAT_KEYS
     return dict(zip(keys, row, strict=True))
 
 
