@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from random import choice, choices
 
 
 @dataclass
@@ -36,13 +37,13 @@ class SideField:
     最大HP割合ダメージを受ける。ダメージ計算では交代ダメージ処理に使用する。
     """
 
-    spikes: int = 0
+    spikes: int = field(default=0, metadata={"min": 0, "max": 3})
     """まきびしの設置枚数（0〜3）。
 
     交代時に、枚数に応じたダメージを与える。
     計算時には交代ターンの追加ダメージとして参照される。"""
 
-    toxic_spikes: int = 0
+    toxic_spikes: int = field(default=0, metadata={"min": 0, "max": 2})
     """どくびしの設置枚数（0〜2）。
 
     交代時に相手のポケモンに毒/猛毒状態を付与する。
@@ -72,7 +73,10 @@ class BattleField:
     GUI のフィールド表示やダメージ計算ロジックが直接参照する設計です。
     """
 
-    weather: str = "None"
+    weather: str = field(
+        default="None",
+        metadata={"choices": ["None", "Sun", "Rain", "Sandstorm", "Snow"]},
+    )
     """天候。ダメージ計算に直接影響するフィールド効果。
 
     受け付ける値:
@@ -83,7 +87,10 @@ class BattleField:
         - "Snow": ゆき（こおりタイプ以外のポケモンはターン終了時にダメージ）
     """
 
-    terrain: str = "None"
+    terrain: str = field(
+        default="None",
+        metadata={"choices": ["None", "Electric", "Grassy", "Psychic", "Misty"]},
+    )
     """フィールド。ダメージ計算や技の追加効果に影響する。
 
     受け付ける値:
@@ -122,18 +129,6 @@ class BattleField:
     ねむり耐性などを解除する。ダメージ計算時は命中判定側で参照される。
     """
 
-    attacker_side: SideField = field(default_factory=SideField)
-    """攻撃側プレイヤーの陣地状態。
-
-    ダメージ計算では攻撃側の特定フィールド効果（例: tailwind）を参照する。
-    """
-
-    defender_side: SideField = field(default_factory=SideField)
-    """防御側プレイヤーの陣地状態。
-
-    ダメージ計算では防御側のフィールド効果（例: reflect, light_screen, aurora_veil）を参照する。
-    """
-
     def reset(self) -> None:
         """フィールド状態をすべて初期値に戻す。
 
@@ -146,5 +141,3 @@ class BattleField:
         self.magic_room = False
         self.wonder_room = False
         self.gravity = False
-        self.attacker_side = SideField()
-        self.defender_side = SideField()

@@ -1,4 +1,4 @@
-from state import BattleField, SideField
+from .state import BattleField, SideField
 
 __all__ = ["BattleField", "SideField"]
 

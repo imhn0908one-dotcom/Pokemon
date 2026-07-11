@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from tkinter import N
 from POKEMON.instance import PokemonInstance
 from FIELD.state import BattleField, SideField
 

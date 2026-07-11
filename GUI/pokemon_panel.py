@@ -1,6 +1,11 @@
 # Pokemon Panel for the GUI select pokemon and show its details
 # makingGUI with python and Pyside6
-from POKEMON import manager
+from POKEMON import manager, instance, factory
+
+from dataclasses import dataclass, fields
+from typing import Dict
+from FIELD.state import BattleField
+from .field_panel import FieldPanel
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -29,7 +34,9 @@ from PySide6.QtCore import (
     QSize,
     QTimer,
 )
-from typing import Dict, List, Tuple
+from typing import List, Tuple
+from GUI import panel_logic
+from GUI import field_panel
 
 
 class SelectionComboBox(QComboBox):
@@ -45,25 +52,33 @@ class SelectionComboBox(QComboBox):
 
 
 class PokemonPanel(QFrame):
-    def __init__(self, panel_name):
+    def __init__(self, panel_name, battle_manager):
         super().__init__()
         self.setWindowTitle(f"{panel_name} Panel")
+        self.battle_manager = battle_manager
+        self.instance_atk_or_def = panel_name
         # window size
         self.setMinimumSize(200, 300)
-
+        self.side_state_widget = {}
         # layout
+        self.field_selection_layout = QVBoxLayout()
         main_layout = QVBoxLayout()
         main_layout.addWidget(QLabel(f"{panel_name} Selection"))
-        main_layout.addWidget(
-            SelectionComboBox(items=manager.get_selectable_pokemon_map())
+        self.pokemon_combo = panel_logic.SelectionComboBox(
+            items=manager.get_selectable_pokemon_map()
         )
+        self.pokemon_combo.currentIndexChanged.connect(
+            self.emit_updated_pokemon_instance
+        )
+        main_layout.addWidget(self.pokemon_combo)
 
         self.setLayout(main_layout)
 
-    # get seleccted pokemon id
-    def get_selected_pokemon_id(self) -> int | None:
-        """Return the selected Pokemon ID from the combo box."""
-        combo_box = self.findChild(SelectionComboBox)
-        if combo_box is not None:
-            return combo_box.currentData()
-        return None
+    # if pokemon is selected, emit pokemon instance
+    def emit_updated_pokemon_instance(self):
+        id = self.pokemon_combo.currentData()
+        maked_instance = factory.create_pokemon_by_id(id)
+        if self.instance_atk_or_def == "attacker":
+            self.battle_manager.set_attacker(maked_instance)
+        elif self.instance_atk_or_def == "defender":
+            self.battle_manager.set_defender(maked_instance)

@@ -40,6 +40,7 @@ from POKEMON.manager import learnt_move_names_to_dict
 from GUI.pokemon_panel import PokemonPanel
 from GUI.result_panel import ResultPanel
 from GUI.field_panel import FieldPanel
+from BATTLE import battle_manager
 
 
 class MainWindow(QMainWindow):
@@ -49,12 +50,13 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.battle_manager = battle_manager.BattleManager()
         self.setWindowTitle("Main Window")
         # pannel
-        self.left_pannel = PokemonPanel("Attacker")
-        self.right_pannel = PokemonPanel("Defender")
+        self.left_pannel = PokemonPanel("attacker", self.battle_manager)
+        self.right_pannel = PokemonPanel("defender", self.battle_manager)
         self.result_pannel = ResultPanel()
-        self.bottom_pannel = FieldPanel()
+        self.bottom_pannel = FieldPanel(battle_manager=self.battle_manager)
         # object name
         self.left_pannel.setObjectName("left_pannel")
         self.right_pannel.setObjectName("right_pannel")
