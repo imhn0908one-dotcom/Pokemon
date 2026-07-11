@@ -31,12 +31,6 @@ if str(ROOT_DIR) not in sys.path:
 
 
 class MainWindow(QMainWindow):
-    """メイン GUI ウィンドウ。
-
-    - 左サイド: ポケモンの選択とインスタンス生成操作を行うパネル
-    - 右サイド: 生成された `PokemonInstance` の情報を表示するパネル
-    """
-
     def __init__(self):
         super().__init__()
 
