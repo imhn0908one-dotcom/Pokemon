@@ -60,6 +60,7 @@ class PokemonPanel(QFrame):
         self.pokemon_combo.currentIndexChanged.connect(
             self.emit_updated_pokemon_instance
         )
+
         main_layout.addWidget(self.pokemon_combo)
         print(self.styleSheet())
         self.setLayout(main_layout)

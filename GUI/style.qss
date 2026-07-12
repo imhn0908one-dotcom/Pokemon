@@ -14,7 +14,7 @@ QSplitter::handle {
     padding: 5px 10px;
     background: #ffffff;
     font-size: 14px;
-    color: #0d5cac;
+    color: #091d31;
 }
 
 /* ホバーした時の動き */
@@ -47,10 +47,10 @@ QSplitter::handle {
 #pokemon_selection QAbstractItemView {
     border: 1px solid #bdc3c7;
     background-color: #ffffff;
-    selection-background-color: #7034026e; /* 選択時の色 */
-    selection-color: #3a89b6;
+    selection-background-color: #8a6f5780; /* 選択時の色 */
+    selection-color: #142935;
     border-radius: 4px;
-    color:#2c3e50
+    color:#06131f;
 
 }
 
