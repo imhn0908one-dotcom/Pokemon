@@ -1,12 +1,12 @@
 import sys
+import PySide6
 from PySide6.QtWidgets import QApplication
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from GUI.main_window import MainWindow
 from PySide6 import QtCore
-from PySide6.QtCore import QMetaObject, Qt
-
-# ... import など ...
+from PySide6.QtCore import QMetaObject
+from PySide6.QtCore import Qt
 
 
 # 監視用のイベントハンドラを少しシンプルにする
@@ -20,7 +20,7 @@ class QSSHandler(FileSystemEventHandler):
         QMetaObject.invokeMethod(
             self.window,
             "load_stylesheet",
-            Qt.QueuedConnection,
+            Qt.ConnectionType.QueuedConnection,
             QtCore.Q_ARG(str, self.qss_path),
         )
         print("QSS 再読み込みの要求をメインスレッドに送りました。")

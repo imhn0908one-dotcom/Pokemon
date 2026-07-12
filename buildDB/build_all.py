@@ -57,15 +57,15 @@ def fetch_and_build_types():
 
     type_query = """
     query samplePokeAPIquery {
-      type {
-        id
-        name
-        typeefficacies {
-          damage_type_id
-          damage_factor
+        type {
+            id
+            name
+            typeefficacies {
+            damage_type_id
+            damage_factor
+            }
         }
-      }
-    }
+        }
     """
 
     try:
@@ -263,19 +263,19 @@ def rebuild_move_basicdata():
         return
 
     graphql_query = """
-    query GetMoveBasicData($moveIds: [Int!]) {
-      move(where: {id: {_in: $moveIds}}) {
-        id
-        name
-        type_id
-        power
-        accuracy
-        pp
-        priority
-        move_damage_class_id
-        move_target_id
-      }
-    }
+        query GetMoveBasicData($moveIds: [Int!]) {
+        move(where: {id: {_in: $moveIds}}) {
+            id
+            name
+            type_id
+            power
+            accuracy
+            pp
+            priority
+            move_damage_class_id
+            move_target_id
+        }
+        }
     """
 
     logging.info("=== 🌐 PokeAPI GraphQL から基本データの取得開始 ===")
@@ -394,26 +394,26 @@ def fetch_and_build_move_details():
       move(where: {id: {_in: $moveIds}}) {
         id
         movemeta {
-          move_meta_ailment_id
-          ailment_chance
-          flinch_chance
-          stat_chance
-          crit_rate
-          min_hits
-          max_hits
-          min_turns
-          max_turns
-          drain
-          healing
-          move_meta_category_id
+            move_meta_ailment_id
+            ailment_chance
+            flinch_chance
+            stat_chance
+            crit_rate
+            min_hits
+            max_hits
+            min_turns
+            max_turns
+            drain
+            healing
+            move_meta_category_id
         }
-      }
-      
-      movemetastatchange(where: {move_id: {_in: $moveIds}}) {
+        }
+        
+        movemetastatchange(where: {move_id: {_in: $moveIds}}) {
         move_id
         stat_id
         change
-      }
+        }
     }
     """
 
@@ -506,7 +506,7 @@ def fetch_and_build_move_details():
                     """
                     INSERT INTO move_meta 
                     (move_id, ailment_id, ailment_chance, flinch_chance, stat_chance, crit_rate, 
-                     min_hits, max_hits, min_turns, max_turns, drain, healing, category_id)
+                    min_hits, max_hits, min_turns, max_turns, drain, healing, category_id)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                     (
@@ -567,20 +567,20 @@ def fetch_and_build_tables():
 
     GRAPHQL_QUERY = """
     query samplePokeAPIquery {
-      pokemon(where: {pokemonmoves: {version_group_id: {_eq: 32}}}) {
+        pokemon(where: {pokemonmoves: {version_group_id: {_eq: 32}}}) {
         id
         name
         pokemonabilities {
-          ability_id
-          is_hidden
+            ability_id
+            is_hidden
         }
         pokemontypes {
-          type_id
+            type_id
         }
         pokemonstats {
-          base_stat
+            base_stat
         }
-      }
+    }
     }
     """
 
@@ -709,12 +709,12 @@ def fetch_and_save_natures():
     logging.info("🌐 PokeAPIから性格補正データを取得中...")
     GRAPHQL_QUERY = """
     query samplePokeAPIquery {
-      nature {
+        nature {
         id
         name
         increased_stat_id
         decreased_stat_id
-      }
+        }
     }
     """
 
@@ -782,10 +782,10 @@ def fetch_and_build_gender_rate():
 
     graphql_query = """
     query GetPokemonSpeciesGenderRate($speciesIds: [Int!]) {
-      pokemonspecies(where: {id: {_in: $speciesIds}}) {
-        id
-        gender_rate
-      }
+        pokemonspecies(where: {id: {_in: $speciesIds}}) {
+            id
+            gender_rate
+        }
     }
     """
 
