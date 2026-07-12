@@ -54,7 +54,7 @@ class DamageCalculater:
         else:
             return None
 
-    def calculate_damage(self, attacker, defender, move_index ):
+    def calculate_damage(self, attacker, defender, move_index):
         """ダメージ計算の雛形。今後の実装に向けたプレースホルダー。"""
         movedata = self.move_basic_data(attacker.moves[move_index])
         damage = math.floor(2 * attacker.level / 5) + 2

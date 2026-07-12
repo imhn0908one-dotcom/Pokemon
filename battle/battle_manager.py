@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from POKEMON.instance import PokemonInstance
 from FIELD.state import BattleField, SideField
+from PySide6.QtCore import QObject
 
 
-class BattleManager:
+# BATTLE/battle_manager.py
+# receive from GUI and send calculater
+class BattleManager(QObject):
     def __init__(self) -> None:
         self.attacker: PokemonInstance | None = None
         self.defender: PokemonInstance | None = None

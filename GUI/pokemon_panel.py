@@ -73,3 +73,14 @@ class PokemonPanel(QFrame):
             self.battle_manager.set_attacker(maked_instance)
         elif self.instance_atk_or_def == "defender":
             self.battle_manager.set_defender(maked_instance)
+
+
+# pokemon view(details)
+class PokemonViewPanel(QWidget):
+    def __init__(self, panel_name, battle_manager):
+        super().__init__()
+        self.setWindowTitle("Pokemon View Panel")
+        self.battle_manager = battle_manager
+        self.setObjectName(panel_name)
+
+    pass
