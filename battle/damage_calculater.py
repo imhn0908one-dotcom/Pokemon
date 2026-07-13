@@ -92,6 +92,9 @@ class Damagecalculator:
         damage = math.floor(damage/defender.basestats["Def"])
 
         return damage
+        # (((レベル×2/5+2)×威力×A/D)/50+2)×範囲補正×おやこあい補正×天気補正×急所補正×乱数補正×タイプ一致補正×相性補正×やけど補正×M
+        return attacker.name
+        pass
 
 
 @dataclass
