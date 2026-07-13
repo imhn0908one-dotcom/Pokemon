@@ -1,6 +1,10 @@
 import sqlite3
 import math
 from contextlib import contextmanager
+import stat
+import types
+from dataclasses import dataclass
+from POKEMON.instance import PokemonInstance
 
 
 class DamageCalculater:
@@ -54,13 +58,18 @@ class DamageCalculater:
         else:
             return None
 
-    def calculate_damage(self, attacker, defender, move_index):
-        """ダメージ計算の雛形。今後の実装に向けたプレースホルダー。"""
-        movedata = self.move_basic_data(attacker.moves[move_index])
-        damage = math.floor(2 * attacker.level / 5) + 2
-        damage_class = movedata["damage_class_id"]  # タイプによって計算などが変化。
-        # 1 = 変化, 2 = 物理, 3 = 特殊
+    def damage_calculater(
+        self,
+        attacker: PokemonInstance,
+        defender: PokemonInstance,
+    ):
+        pass
 
-        if damage_class == 1:
-            pass
-        return damage
+
+@dataclass
+class DamageResult:
+    hp_change: dict[str, list[int]]
+    # how_many_times_to_kill: dict
+    kill_chance: dict[str, int]
+    status_change_attacker: dict[str, int]
+    status_change_defender: dict[str, int]

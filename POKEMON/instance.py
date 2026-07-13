@@ -2,12 +2,14 @@ from dataclasses import dataclass, field
 from typing import Dict, List
 import threading
 
+from pokebase import item
+
 
 @dataclass
 class PokemonInstance:
-    id: int = 0
-    name: str = ""
-    types: List[str] = field(default_factory=list)
+    id: int = 0  # pokemon ID
+    name: str = ""  # pokemon name
+    types: List[str] = field(default_factory=list)  # length 1~4
     basestats: Dict[str, int] = field(
         default_factory=lambda: {
             "HP": 0,
@@ -28,8 +30,22 @@ class PokemonInstance:
             "Spe": 0,
         }
     )
-    genderid: int = 0
-    natureid: int = 0
+    rank: Dict[str, int] = field(
+        default_factory=lambda: {
+            "Atk": 0,
+            "Def": 0,
+            "SpA": 0,
+            "SpD": 0,
+            "Spe": 0,
+            "Acuracy_rate": 0,
+            "Evasion_rate": 0,
+        }
+    )
+    gender_Id: int = 0
+    nature_Id: int = 0
+    item_Id: int = 0
+
+    # moves
     learnt_move_ids: List[int] = field(default_factory=list)
     selected_move_ids: List[int] = field(default_factory=lambda: [0, 0, 0, 0])
 
@@ -90,8 +106,9 @@ class PokemonInstance:
             "types": list(self.types),
             "basestats": dict(self.basestats),
             "evs": dict(self.evs),
-            "genderid": int(self.genderid),
-            "natureid": int(self.natureid),
+            "genderid": int(self.gender_Id),
+            "natureid": int(self.nature_Id),
+            "itemid": int(self.item_Id),
             "learnt_move_ids": list(self.learnt_move_ids),
             "selected_move_ids": list(self.selected_move_ids),
         }
