@@ -3,6 +3,7 @@ import math
 from contextlib import contextmanager
 import stat
 import types
+from types import Dict
 from dataclasses import dataclass
 from POKEMON.instance import PokemonInstance
 import random as rand
@@ -61,12 +62,14 @@ class Damagecalculator:
         
     def real_stat_calculator(
             self,
-            attacker: PokemonInstance
-            
+            instance: PokemonInstance
     ):
-        
-        pass
-        """
+        for key, value in instance.basestats.items():
+            if key=="HP":
+                return value+instance.evs+75
+            else:
+                return (value+instance.evs+20)*instance.stats[key]
+    """
         最大HP
             種族値+能力ポイント+75
         攻撃・防御・特攻・特防・素早さ
