@@ -5,7 +5,7 @@ from PySide6.QtCore import QObject
 
 
 # BATTLE/battle_manager.py
-# receive from GUI and send calculater
+# receive from GUI and send calculator
 class BattleManager(QObject):
     def __init__(self) -> None:
         self.attacker: PokemonInstance | None = None

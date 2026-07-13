@@ -43,6 +43,8 @@ class PokemonInstance:
     )
     gender_Id: int = 0
     nature_Id: int = 0
+    stat_change: Dict[str, int] = field(default_factory=dict)
+    """""status change by nature"""""
     item_Id: int = 0
 
     # moves
