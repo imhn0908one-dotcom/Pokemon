@@ -1,6 +1,6 @@
+import threading
 from dataclasses import dataclass, field
 from typing import Dict, List
-import threading
 
 from pokebase import item
 
@@ -20,7 +20,7 @@ class PokemonInstance:
             "Spe": 0,
         }
     )
-    evs: Dict[str, int] = field(
+    evs: Dict[str, int] = field(  # 努力値のこと
         default_factory=lambda: {
             "HP": 0,
             "Atk": 0,
@@ -30,7 +30,7 @@ class PokemonInstance:
             "Spe": 0,
         }
     )
-    rank: Dict[str, int] = field(
+    rank: Dict[str, int] = field(  # 剣の舞とかで上がるアレ
         default_factory=lambda: {
             "Atk": 0,
             "Def": 0,
