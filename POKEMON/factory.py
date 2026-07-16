@@ -1,5 +1,9 @@
 import sqlite3
+from calendar import c
+from contextlib import contextmanager
 from typing import Optional
+
+from shiboken6 import Object
 
 from .instance import PokemonInstance
 
@@ -14,6 +18,15 @@ DB_STAT_COLUMNS = [
     "speed",
 ]
 
+
+@contextmanager
+def _database():
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        yield conn.cursor()
+    finally:
+        conn.close()
+    
 
 def _fetch_pokemon_row(conn: sqlite3.Connection, name: str) -> Optional[dict]:
     cur = conn.cursor()
@@ -152,10 +165,10 @@ def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance]:
         }
 
         inst.evs = inst.evs
-        inst.genderid = (
+        inst.gender_Id = (
             int(row.get("gender_id", 0)) if row.get("gender_id") is not None else 0
         )
-        inst.natureid = (
+        inst.nature_Id = (
             int(row.get("nature_id", 0)) if row.get("nature_id") is not None else 0
         )
 
@@ -165,3 +178,4 @@ def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance]:
         return inst
     finally:
         conn.close()
+

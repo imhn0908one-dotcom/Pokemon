@@ -1,6 +1,6 @@
+import threading
 from dataclasses import dataclass, field
 from typing import Dict, List
-import threading
 
 from pokebase import item
 
