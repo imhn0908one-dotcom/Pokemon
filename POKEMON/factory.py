@@ -117,10 +117,10 @@ def create_pokemon_by_name(pokemon_name: str) -> Optional[PokemonInstance]:
         inst.evs = inst.evs  # keep default
 
         # genderid / natureid - default 0 unless DB provides columns
-        inst.genderid = (
+        inst.gender_Id = (
             int(row.get("gender_id", 0)) if row.get("gender_id") is not None else 0
         )
-        inst.natureid = (
+        inst.nature_Id = (
             int(row.get("nature_id", 0)) if row.get("nature_id") is not None else 0
         )
 
@@ -133,7 +133,7 @@ def create_pokemon_by_name(pokemon_name: str) -> Optional[PokemonInstance]:
         conn.close()
 
 
-def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance]:
+def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance] | None:
     """Create a PokemonInstance from DB using numeric pokemon_id (int).
 
     Returns None if the pokemon_id is not found.
