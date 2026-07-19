@@ -1,12 +1,13 @@
-import sqlite3
 import math
-from contextlib import contextmanager
+import random as rand
+import sqlite3
 import stat
 import types
-from types import Dict
+from contextlib import contextmanager
 from dataclasses import dataclass
+from types import Dict
+
 from POKEMON.instance import PokemonInstance
-import random as rand
 
 
 class Damagecalculator:
@@ -65,10 +66,10 @@ class Damagecalculator:
             instance: PokemonInstance
     ):
         for key, value in instance.basestats.items():
-            if key=="HP":
-                return value+instance.evs+75
+            if key == "HP":
+                return value + instance.evs[key] + 75
             else:
-                return (value+instance.evs+20)*instance.stats[key]
+                return (value + instance.evs[key] + 20) * instance.rank[key]
     """
         最大HP
             種族値+能力ポイント+75
@@ -80,19 +81,17 @@ class Damagecalculator:
         self,
         attacker: PokemonInstance,
         defender: PokemonInstance,
-        move_id : int
+        move_id: int
     ):
         move_data = self.move_basic_data(move_id)
-        #ダメージ = (((レベル×2/5+2)×威力×A/D)/50+2)×範囲補正×おやこあい補正×天気補正×急所補正×乱数補正×タイプ一致補正×相性補正×やけど補正×M
+        # ダメージ = (((レベル×2/5+2)×威力×A/D)/50+2)×範囲補正×おやこあい補正×天気補正×急所補正×乱数補正×タイプ一致補正×相性補正×やけど補正×M
 
-
-
-        #持ち物取得
-        #持ち物、による威力補正　 これの実装により”””damage = math.floor(22*move_data["power"])”””の変更が必要
+        # 持ち物取得
+        # 持ち物、による威力補正　 これの実装により”””damage = math.floor(22*move_data["power"])”””の変更が必要
         
-        damage = math.floor(22*move_data["power"])
-        damage = math.floor(damage*attacker.basestats["Atk"])
-        damage = math.floor(damage/defender.basestats["Def"])
+        damage = math.floor(22 * move_data["power"])
+        damage = math.floor(damage * attacker.basestats["Atk"])
+        damage = math.floor(damage / defender.basestats["Def"])
 
         return damage
 

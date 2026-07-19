@@ -5,5 +5,5 @@ AA = factory.create_pokemon_by_id(3)
 BB = factory.create_pokemon_by_name("eevee")
 
 CC = Damagecalculator()
-
-print(CC.damage_calculator(AA, AA, 1))
+if AA and BB:  # pokemonが見つかった場合
+    print(CC.damage_calculator(AA, AA, 1))

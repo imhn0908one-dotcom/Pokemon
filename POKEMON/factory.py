@@ -3,8 +3,6 @@ from calendar import c
 from contextlib import contextmanager
 from typing import Optional
 
-from shiboken6 import Object
-
 from .instance import PokemonInstance
 
 DB_PATH = "pokemon_champions.db"
@@ -26,7 +24,7 @@ def _database():
         yield conn.cursor()
     finally:
         conn.close()
-    
+
 
 def _fetch_pokemon_row(conn: sqlite3.Connection, name: str) -> Optional[dict]:
     cur = conn.cursor()
@@ -103,8 +101,8 @@ def create_pokemon_by_name(pokemon_name: str) -> Optional[PokemonInstance]:
             types.append(str(row.get("type_id2")))
         inst.types = types
 
-        # base stats mapping from DB columns -> basestats
-        inst.basestats = {
+        # base stats mapping from DB columns -> base_stats
+        inst.base_stats = {
             "HP": int(row.get("HP", 0)),
             "Atk": int(row.get("Atk", 0)),
             "Def": int(row.get("Def", 0)),
@@ -155,7 +153,7 @@ def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance] | None:
             types.append(str(row.get("type_id2")))
         inst.types = types
 
-        inst.basestats = {
+        inst.base_stats = {
             "HP": int(row.get("HP", 0)),
             "Atk": int(row.get("Atk", 0)),
             "Def": int(row.get("Def", 0)),
@@ -178,4 +176,3 @@ def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance] | None:
         return inst
     finally:
         conn.close()
-
