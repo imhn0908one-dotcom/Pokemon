@@ -1,35 +1,15 @@
-window.addEventListener('DOMContentLoaded', () => {
-  
-  fetch('/api/get-options')
-    .then(response => response.json())
-    .then(dataList => {
-      // ❶ さっき作った datalist を捕まえる！
-      const dataListTag = document.getElementById('pokemon-options');
-      dataListTag.innerHTML = ''; // 中身を一度クリア
-
-      // ❷ Pythonから届いた配列をループ処理
-      dataList.forEach(item => {
-        const optionTag = document.createElement('option');
-        
-        // 💡 datalistの場合、valueに「画面に見せたい文字」を入れます。
-        // こうすると、入力欄に日本語名（例：ブリジュラス）が綺麗に表示・検索されます！
-        optionTag.value = item.name; 
-        
-        // （オプション）裏でIDも持たせたい場合は、data属性という引き出しにしまっておけます
-        optionTag.setAttribute('data-id', item.id);
-        
-        dataListTag.appendChild(optionTag); // リストの中に追加！
-      });
-    })
-    .catch(error => {
-      console.error("通信に失敗しました:", error);
-    });
+// 1. 🚀 まずは全体を縦に3等分（33.3% ずつ）に切り分ける！
+Split(['#left-pane', '#middle-pane', '#right-pane'], {
+    sizes: [33.3, 33.3, 33.3], // 初期の幅（%）
+    minSize: 150,              // 最小幅（px）
+    gutterSize: 10,            // 仕切り線の太さ（px）
+    direction: 'horizontal',   // 左右に分割するモード
 });
-document.getElementById('pokemon-input').addEventListener('input', () => {
-  const selectedValue = document.getElementById('pokemon-input').value;
-  const selectedOption  = document.querySelector(`#pokemon-options option[value="${selectedValue}"]`);
-  if (selectedOption) {
-    const id = selectedOption.getAttribute('data-id');
-    console.log('選択されたID:', id);
-  }
+
+// 2. 🚀 次に、真ん中の箱（#middle-pane）の中身を上下（50% ずつ）に切り分ける！
+Split(['#mid-top', '#mid-bottom'], {
+    sizes: [50, 50],           // 初期の高さ（%）
+    minSize: 100,              // 最小の高さ（px）
+    gutterSize: 10,            // 仕切り線の太さ（px）
+    direction: 'vertical',     // 上下に分割するモード
 });

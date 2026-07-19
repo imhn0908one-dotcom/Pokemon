@@ -1,25 +1,33 @@
 <!DOCTYPE html>
-<html lang="jp">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
-        <style type="/static/css/style.css"></style>
-    </head>
-    <body>
-        <div style="margin: 20px;">
-            <label for="pokemon-input">ポケモン検索：</label>
-            <!-- 💡 list="pokemon-options" で、下のdatalistとドッキングさせています -->
-            <input type="text" id="pokemon-input" list="pokemon-options" placeholder="名前を入力、またはダブルクリックで一覧表示" style="padding: 8px; width: 300px;">
-            
-            <!-- 💡 ここにPythonからの選択肢が自動で入ります -->
-            <datalist id="pokemon-options"></datalist>
-        </div>
-        <div style="margin: 20px;" id="pokemon-panel" class="pokemon-panel">
-            
-        </div>
-        <script src="/static/js/script.js"></script>
-    </body>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>最強ダメージ計算ツール</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+</head>
+<body>
+{% macro pokemon_pannel(side, pokemon) %}
+    <div id="{{side}}-pane" class="pane">
+        <h3>{{side}}（{{pokemon['name']}}）</h3>
+    </div>
+{% endmacro %}
+    <div class="flex-container row">
 
-</html> 
+
+        <div id="middle-pane" class="pane flex-container column">
+            <div id="mid-top" class="pane">
+                <h3>フィールド（中央上）</h3>
+            </div>
+            <div id="mid-bottom" class="pane">
+                <h3>計算結果（中央下）</h3>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

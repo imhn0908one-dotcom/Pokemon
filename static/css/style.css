@@ -1,0 +1,50 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* 基本のコンテナ構造 */
+.flex-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+/* 縦並び（左右分割）用 */
+.row { flex-direction: row; }
+/* 横並び（上下分割）用 */
+.column { flex-direction: column; }
+
+/* 各ペインの基本スタイル */
+.pane {
+  background-color: #f9f9f9;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.pane.flex-container.column{
+    padding:0;
+}
+/* 🛠️ Split.jsが勝手に生成する「仕切り線」の共通デザイン */
+.gutter {
+  background-color: #ddd;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+.gutter:hover {
+  background-color: #999; /* ホバーした時に掴みやすく色を濃く */
+}
+
+/* ↕️ 縦割りの時の仕切り線（左右に動く） */
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+  height: 100%;
+}
+
+/* ↔️ 横割りの時の仕切り線（上下に動く） */
+.gutter.gutter-vertical {
+  cursor: row-resize;
+  width: 100%;
+}
