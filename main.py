@@ -1,12 +1,13 @@
 import sys
+
 import PySide6
-from PySide6.QtWidgets import QApplication
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from GUI.main_window import MainWindow
 from PySide6 import QtCore
-from PySide6.QtCore import QMetaObject
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QMetaObject, Qt
+from PySide6.QtWidgets import QApplication
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+
+from GUI.main_window import MainWindow
 
 
 # 監視用のイベントハンドラを少しシンプルにする

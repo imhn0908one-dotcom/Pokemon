@@ -1,16 +1,19 @@
 import threading
 from dataclasses import dataclass, field
+from re import M
 from typing import Dict, List
 
 from pokebase import item
 
 
-@dataclass
+@dataclass(slots=True)
 class PokemonInstance:
-    id: int = 0  # pokemon ID
-    name: str = ""  # pokemon name
+    id: int = field(metadata={"description": "pokemon ID"})  # pokemon ID
+    name: str = field(metadata={"description": "pokemon name"})
+    level: int = field(metadata={"description": "pokemon level"})
     types: List[str] = field(default_factory=list)  # length 1~4
-    basestats: Dict[str, int] = field(
+    base_stats: Dict[str, int] = field(
+        metadata={"description": "種族値"},
         default_factory=lambda: {
             "HP": 0,
             "Atk": 0,
@@ -18,9 +21,9 @@ class PokemonInstance:
             "SpA": 0,
             "SpD": 0,
             "Spe": 0,
-        }
+        },
     )
-    evs: Dict[str, int] = field(  # 努力値のこと
+    evs: Dict[str, int] = field(
         default_factory=lambda: {
             "HP": 0,
             "Atk": 0,
@@ -28,23 +31,24 @@ class PokemonInstance:
             "SpA": 0,
             "SpD": 0,
             "Spe": 0,
-        }
+        },
     )
-    rank: Dict[str, int] = field(  # 剣の舞とかで上がるアレ
+    rank: Dict[str, int] = field(
         default_factory=lambda: {
             "Atk": 0,
             "Def": 0,
             "SpA": 0,
             "SpD": 0,
             "Spe": 0,
-            "Acuracy_rate": 0,
+            "Accuracy_rate": 0,
             "Evasion_rate": 0,
-        }
+        },
     )
     gender_Id: int = 0
     nature_Id: int = 0
-    stat_change: Dict[str, int] = field(default_factory=dict)
-    """""status change by nature"""""
+    stat_change: Dict[str, int] = field(
+        default_factory=dict, metadata={"description": "性格によるステート変化"}
+    )
     item_Id: int = 0
 
     # moves
@@ -106,7 +110,7 @@ class PokemonInstance:
             "id": int(self.id),
             "name": str(self.name),
             "types": list(self.types),
-            "basestats": dict(self.basestats),
+            "base_stats": dict(self.base_stats),
             "evs": dict(self.evs),
             "genderid": int(self.gender_Id),
             "natureid": int(self.nature_Id),

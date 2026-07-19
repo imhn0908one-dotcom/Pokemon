@@ -1,4 +1,6 @@
 import sqlite3
+from calendar import c
+from contextlib import contextmanager
 from typing import Optional
 
 from .instance import PokemonInstance
@@ -13,6 +15,15 @@ DB_STAT_COLUMNS = [
     "special_defense",
     "speed",
 ]
+
+
+@contextmanager
+def _database():
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        yield conn.cursor()
+    finally:
+        conn.close()
 
 
 def _fetch_pokemon_row(conn: sqlite3.Connection, name: str) -> Optional[dict]:
@@ -90,8 +101,8 @@ def create_pokemon_by_name(pokemon_name: str) -> Optional[PokemonInstance]:
             types.append(str(row.get("type_id2")))
         inst.types = types
 
-        # base stats mapping from DB columns -> basestats
-        inst.basestats = {
+        # base stats mapping from DB columns -> base_stats
+        inst.base_stats = {
             "HP": int(row.get("HP", 0)),
             "Atk": int(row.get("Atk", 0)),
             "Def": int(row.get("Def", 0)),
@@ -104,10 +115,10 @@ def create_pokemon_by_name(pokemon_name: str) -> Optional[PokemonInstance]:
         inst.evs = inst.evs  # keep default
 
         # genderid / natureid - default 0 unless DB provides columns
-        inst.genderid = (
+        inst.gender_Id = (
             int(row.get("gender_id", 0)) if row.get("gender_id") is not None else 0
         )
-        inst.natureid = (
+        inst.nature_Id = (
             int(row.get("nature_id", 0)) if row.get("nature_id") is not None else 0
         )
 
@@ -120,7 +131,7 @@ def create_pokemon_by_name(pokemon_name: str) -> Optional[PokemonInstance]:
         conn.close()
 
 
-def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance]:
+def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance] | None:
     """Create a PokemonInstance from DB using numeric pokemon_id (int).
 
     Returns None if the pokemon_id is not found.
@@ -142,7 +153,7 @@ def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance]:
             types.append(str(row.get("type_id2")))
         inst.types = types
 
-        inst.basestats = {
+        inst.base_stats = {
             "HP": int(row.get("HP", 0)),
             "Atk": int(row.get("Atk", 0)),
             "Def": int(row.get("Def", 0)),
@@ -152,10 +163,10 @@ def create_pokemon_by_id(pokemon_id: int) -> Optional[PokemonInstance]:
         }
 
         inst.evs = inst.evs
-        inst.genderid = (
+        inst.gender_Id = (
             int(row.get("gender_id", 0)) if row.get("gender_id") is not None else 0
         )
-        inst.natureid = (
+        inst.nature_Id = (
             int(row.get("nature_id", 0)) if row.get("nature_id") is not None else 0
         )
 
