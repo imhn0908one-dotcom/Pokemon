@@ -1,8 +1,9 @@
 import threading
-from curses import meta
 from dataclasses import dataclass, field
 from re import M
 from typing import Dict, List
+
+from pokebase import item
 
 
 @dataclass(slots=True)
@@ -23,7 +24,6 @@ class PokemonInstance:
         },
     )
     evs: Dict[str, int] = field(
-        metadata={"description": "努力値"},
         default_factory=lambda: {
             "HP": 0,
             "Atk": 0,
@@ -34,7 +34,6 @@ class PokemonInstance:
         },
     )
     rank: Dict[str, int] = field(
-        metadata={"description": "能力ランク"},
         default_factory=lambda: {
             "Atk": 0,
             "Def": 0,
