@@ -1,5 +1,6 @@
-import sqlite3
+import json
 import os
+import sqlite3
 import sys
 from typing import Dict, Iterable, List
 
@@ -90,19 +91,7 @@ def get_selectable_pokemon_map() -> Dict[int, str]:
     selection logic where the caller needs to show the name and keep the ID as
     the stable identifier.
     """
-    conn = sqlite3.connect(DB_PATH)
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, name FROM pokemon ORDER BY id")
-        rows = cursor.fetchall()
-
-        selection_map: Dict[int, str] = {}
-        for row in rows:
-            pokemon_id, pokemon_name = row
-            if pokemon_id is None or pokemon_name is None:
-                continue
-            selection_map[int(pokemon_id)] = str(pokemon_name)
-
-        return selection_map
-    finally:
-        conn.close()
+    filename = "JSON/pokemon.json"
+    with open(filename, "r", encoding="utf-8") as f:
+        all_pokemon = json.load(f)
+    return {int(key): value["name"] for key, value in all_pokemon.items()}
